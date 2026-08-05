@@ -97,7 +97,7 @@ The dashboard is available in the `dashboard` folder as a PDF:
 
 The complete project report is available here:
 
-[View Final Report](report/cyclistic-final-report.pdf)
+[View Final Report](Report/Cyclistic_Final_Report.pdf)
 
 ## 🚀 Skills Demonstrated
 
