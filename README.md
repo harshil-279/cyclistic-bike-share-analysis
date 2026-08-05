@@ -74,7 +74,9 @@ The analysis focused on:
 
 ## 📉 Dashboard
 
-The dashboard is available in the `dashboard` folder as a PDF.
+The dashboard is available in the `dashboard` folder as a PDF:
+
+[View Dashboard](Dashboard/Dashboard.pdf)
 
 ## 💡 Key Insights
 
