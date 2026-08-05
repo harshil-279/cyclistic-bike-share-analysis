@@ -1,0 +1,142 @@
+--query 1
+SELECT
+    started_at,
+    ended_at,
+    (julianday(ended_at) - julianday(started_at)) * 86400 AS ride_length_seconds
+FROM trips_full_year;         																																																			</sql><sql name="SQL 2*">
+
+
+
+--query 2
+SELECT
+    started_at,
+    strftime('%w', started_at) AS day_num,
+    CASE strftime('%w', started_at)
+        WHEN '0' THEN 'Sunday'
+        WHEN '1' THEN 'Monday'
+        WHEN '2' THEN 'Tuesday'
+        WHEN '3' THEN 'Wednesday'
+        WHEN '4' THEN 'Thursday'
+        WHEN '5' THEN 'Friday'
+        WHEN '6' THEN 'Saturday'
+    END AS day_of_week
+FROM trips_full_year;																																																							</sql><sql name="SQL 3*">
+
+
+
+
+--query 3
+SELECT COUNT(*) FROM trips_full_year
+WHERE ended_at &lt;= started_at;2																																																					</sql><sql name="SQL 4*">
+
+
+
+--query 4
+SELECT COUNT(*) FROM trips_full_year
+WHERE (julianday(ended_at) - julianday(started_at)) * 86400 &lt; 60;162247																																													</sql><sql name="SQL 5*">
+
+
+
+-- query 5
+SELECT COUNT(*) FROM (
+    SELECT ride_id, COUNT(*) as cnt
+    FROM trips_full_year
+    GROUP BY ride_id
+    HAVING cnt &gt; 1
+);																																																																							</sql><sql name="SQL 6*">
+
+
+
+-- query 6
+CREATE TABLE trips_cleaned AS
+SELECT
+    ride_id,
+    rideable_type,
+    started_at,
+    ended_at,
+    member_casual,
+    start_station_name,
+    end_station_name,
+    (julianday(ended_at) - julianday(started_at)) * 86400 AS ride_length_seconds,
+    CASE strftime('%w', started_at)
+        WHEN '0' THEN 'Sunday'
+        WHEN '1' THEN 'Monday'
+        WHEN '2' THEN 'Tuesday'
+        WHEN '3' THEN 'Wednesday'
+        WHEN '4' THEN 'Thursday'
+        WHEN '5' THEN 'Friday'
+        WHEN '6' THEN 'Saturday'
+    END AS day_of_week,
+    strftime('%m', started_at) AS ride_month
+FROM trips_full_year
+WHERE
+    ended_at &gt; started_at
+    AND (julianday(ended_at) - julianday(started_at)) * 86400 &gt;= 60
+    AND ride_id IN (
+        SELECT ride_id FROM trips_full_year
+        GROUP BY ride_id
+        HAVING COUNT(*) = 1
+    );																																																																										</sql><sql name="SQL 7*">
+	
+	
+	
+	
+-- query 7	
+SELECT COUNT(*) FROM trips_cleaned;																																																													</sql><sql name="SQL 8*">
+
+
+
+
+-- query 8
+SELECT
+    member_casual,
+    COUNT(*) AS total_rides,
+    ROUND(AVG(ride_length_seconds) / 60.0, 1) AS avg_ride_minutes,
+    ROUND(MAX(ride_length_seconds) / 60.0, 1) AS max_ride_minutes
+FROM trips_cleaned
+GROUP BY member_casual;																																															</sql><sql name="SQL 9*">
+
+
+
+
+
+
+-- query 9
+SELECT ride_id, started_at, ended_at, ride_length_seconds/60.0 AS minutes, member_casual
+FROM trips_cleaned
+ORDER BY ride_length_seconds DESC
+LIMIT 10;																																								</sql><sql name="SQL 10*">
+
+
+
+
+-- query 10
+SELECT
+    member_casual,
+    day_of_week,
+    COUNT(*) AS total_rides,
+    ROUND(AVG(ride_length_seconds) / 60.0, 1) AS avg_ride_minutes
+FROM trips_cleaned
+GROUP BY member_casual, day_of_week
+ORDER BY member_casual,
+    CASE day_of_week
+        WHEN 'Sunday' THEN 1
+        WHEN 'Monday' THEN 2
+        WHEN 'Tuesday' THEN 3
+        WHEN 'Wednesday' THEN 4
+        WHEN 'Thursday' THEN 5
+        WHEN 'Friday' THEN 6
+        WHEN 'Saturday' THEN 7
+    END;																																																													</sql><sql name="SQL 11*">
+	
+	
+	
+	
+-- query 11
+	SELECT
+    member_casual,
+    ride_month,
+    COUNT(*) AS total_rides
+FROM trips_cleaned
+GROUP BY member_casual, ride_month
+ORDER BY member_casual, ride_month;
